@@ -11,7 +11,7 @@
 
     const textMap = await fetch('./textMap.json').then(res => res.json())
 
-    window.update = () => {
+    const update = () => {
       const s = document.getElementById('search').value
       const keys = s.toLowerCase().split(' ').filter(Boolean)
       const hit = textMap.filter(([e, c]) => {
@@ -34,13 +34,15 @@
       })
       document.getElementById('wow').innerHTML = res.innerHTML
     }
+
+    document.getElementById('search').oninput = () => { update() }
     
   </script>
 </head>
 
 <body>
 
-  <input type="text" oninput="update()" id="search">
+  <input type="text" id="search">
 
   <div>
     <p id="result"></p>
