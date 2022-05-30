@@ -13,9 +13,9 @@
 
     window.update = () => {
       const s = document.getElementById('search').value
-      const keys = s.split(' ').filter(Boolean)
+      const keys = s.toLowerCase().split(' ').filter(Boolean)
       const hit = textMap.filter(([e, c]) => {
-        const ec = `${e}${c}`
+        const ec = `${e}${c}`.toLowerCase()
         return keys.every(k => ec.includes(k))
       })
       document.getElementById('result').innerText = `100/${hit.length}`
