@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>W</title>
+  <script type=module>
+    console.log('w')
+
+    const textMap = await fetch('./textMap.json').then(res => res.json())
+
+    window.update = () => {
+      const s = document.getElementById('search').value
+      const keys = s.split(' ').filter(Boolean)
+      const hit = textMap.filter(([e, c]) => {
+        const ec = `${e}${c}`
+        return keys.every(k => ec.includes(k))
+      })
+      document.getElementById('result').innerText = `100/${hit.length}`
+      const res = document.createElement('div')
+      hit.slice(0, 100).forEach(([e,c]) => {
+        const div = document.createElement('div')
+        const br = document.createElement('br')
+        const ep = document.createElement('p')
+        const cp = document.createElement('p')
+        ep.innerHTML = e
+        cp.innerHTML = c
+        res.appendChild(br)
+        div.appendChild(ep)
+        div.appendChild(cp)
+        res.appendChild(div)
+      })
+      document.getElementById('wow').innerHTML = res.innerHTML
+    }
+    
+  </script>
+</head>
+
+<body>
+
+  <input type="text" oninput="update()" id="search">
+
+  <div>
+    <p id="result"></p>
+    <div id="wow"></div>
+  </div>
+
+</body>
+
+</html>
