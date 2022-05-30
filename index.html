@@ -36,12 +36,14 @@
     }
 
     document.getElementById('search').oninput = () => { update() }
+    document.getElementById('ready').innerText = '好了'
     
   </script>
 </head>
 
 <body>
 
+  <p id="ready"></p>
   <input type="text" id="search">
 
   <div>
