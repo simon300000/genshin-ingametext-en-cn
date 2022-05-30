@@ -1,0 +1,4 @@
+[submodule "GenshinData"]
+	path = GenshinData
+	url = https://github.com/Dimbreath/GenshinData.git
+	shallow = true
