@@ -8,19 +8,50 @@
   <title>W</title>
   <script type=module>
     console.log('w')
+    const textMapText = /*STARTW*/ await fetch('./textMap.json').then(res => res.text()) /*ENDW*/
 
-    const textMap = await fetch('./textMap.json').then(res => res.json())
 
-    const update = () => {
-      const s = document.getElementById('search').value
+    const search = s => {
       const keys = s.toLowerCase().split(' ').filter(Boolean)
       const hit = textMap.filter(([e, c]) => {
         const ec = `${e}${c}`.toLowerCase()
         return keys.every(k => ec.includes(k))
       })
-      document.getElementById('result').innerText = `100/${hit.length}`
+      const head = hit.slice(0, 100)
+      const length = hit.length
+      return { head, length }
+    }
+
+    const makeWorker = f => {
+      let pendingJobs = {}
+
+      const worker = new Worker(URL.createObjectURL(new Blob([
+        `const textMap = JSON.parse(${JSON.stringify(textMapText)})
+        onmessage = ({ data: { jobId, params } }) => {
+        const result = (${f.toString()})(...params)
+        postMessage({ jobId, result })
+        }`
+      ])))
+
+      worker.onmessage = ({ data: { result, jobId } }) => {
+        pendingJobs[jobId](result)
+        delete pendingJobs[jobId]
+      }
+
+      return (...params) => new Promise(resolve => {
+        const jobId = String(Math.random())
+        pendingJobs[jobId] = resolve
+        worker.postMessage({ jobId, params })
+      })
+    }
+
+    const realSearch = makeWorker(search)
+
+    const update = async () => {
+      const s = document.getElementById('search').value
+      const { head, length } = await realSearch(s)
       const res = document.createElement('div')
-      hit.slice(0, 100).forEach(([e,c]) => {
+      head.forEach(([e,c]) => {
         const div = document.createElement('div')
         const br = document.createElement('br')
         const ep = document.createElement('p')
@@ -32,7 +63,10 @@
         div.appendChild(cp)
         res.appendChild(div)
       })
-      document.getElementById('wow').innerHTML = res.innerHTML
+      if (document.getElementById('search').value === s) {
+        document.getElementById('result').innerText = `100/${length}`
+        document.getElementById('wow').innerHTML = res.innerHTML
+      }
     }
 
     document.getElementById('search').oninput = () => { update() }
